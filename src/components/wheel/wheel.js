@@ -1,31 +1,39 @@
 import React, { Component } from "react";
-import "../../css/wheel.css";
+import { interval, timer } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import getRamdomImage from "../../services/ramdomly-images";
-import WheelFunctions from "./wheel-functions";
+import wheelStore from '../stores/wheel-store';
+
+import "../../css/wheel.css";
 
 class Wheel extends Component {
   constructor(props) {
     super(props);
-    this.wheelFunctions = new WheelFunctions(this.props.speed, this.props.time);
+    this.speed = interval(props.speed);
+    this.timer = timer(props.time);
+    this.subscription = null;
     this.state = {
-      start: this.props.start
+      src: "",
+      id: 0
     };
   }
 
-  componentWillReceiveProps(props) {
-    const started = props.start;
-    if (started) {
-      this.startWheel(started);
-    } else {
-      this.stopWheel(started);
-    }
+  componentWillMount() {
+    wheelStore.on("rollWheels", () => {
+      this.handleWheel(wheelStore.getStateWheel())
+    });
   }
 
   componentDidMount() {
-    this.defineState();
+    this.tick();
   }
-  componentWillUnmount() {
-    this.wheelFunctions.stopWheel();
+
+  handleWheel(state) {
+    if (state) {
+      this.startWheel();
+    } else {
+      this.stopWheel();
+    }
   }
 
   tick() {
@@ -36,39 +44,34 @@ class Wheel extends Component {
     });
   }
 
-  startWheel(started) {
-    this.setState({
-      start: started
-    });
-    this.defineState(started);
-  }
-
-  stopWheel(started) {
-    if (!started && !this.state.start) {
-      const image = getRamdomImage();
-      this.setState({
-        src: image.src,
-        id: image.id
-      });
-    }
-    this.wheelFunctions.stopWheel(() => this.finishedRunning());
-  }
-
-  defineState(started) {
-    if (this.state.start || started)
-      this.wheelFunctions.startWheel(
-        () => this.tick(),
-        () => this.finishedRunning()
+  startWheel() {
+    this.subscription = this.speed
+      .pipe(takeUntil(this.timer))
+      .subscribe(
+        x => this.tick(),
+        e => console.log(`error ${e}`),
+        () => this.stopWheel()
       );
-    else this.stopWheel();
   }
+
+  stopWheel() {
+    if (this.subscription != null) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+      this.finishedRunning();
+    }
+   }
 
   finishedRunning() {
     this.props.result(this.state.id);
   }
 
   render() {
-    return <img src={this.state.src} alt="" className="wheel-image" />;
+    return (
+      <div className="container">
+        <img src={this.state.src} alt="" className="wheel-image" />
+      </div>
+    );
   }
 }
 

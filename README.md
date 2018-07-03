@@ -7,13 +7,15 @@
 You can run `npm run tests` on the root.
 
 ## Components
+  - app - Holds all the components;  
+  - wheel - Each image and his own container is a wheel component;  
+  - winner - Shows the winner based on the result;  
+  - control-buttons - Only the buttons that controls everything.  
   
-  ![Diagram](./diag.png?raw=true "Diagram")
 
 ## How it works
-The event to start all the process begins with the control buttons setting the state of the App for True.   
-My "wheel component" will listen this and start the tick to change the images on the screen based on its props previously configured.  
-I'm using [RxJS](http://reactivex.io/) to handle with the timer and velocity of each wheel (`WheelFunctions`), after each "tick", I call a callback to change the src of my image based on the its state for a new random image (`Image randomizer`).  
-To stop, I just set the state of the App to false, and it will trigger an event on my wheel to unsubscribe of the observable.
+Starting pushing the Start button, each Wheel component will receive the command to start.
+When all of them stops, a new command is sent to Winner component with the result (an Array of Integers).  
+I'm using [RxJS](http://reactivex.io/) to handle with the timer and velocity of each wheel (`Now inside of each one`), after each "tick", I call a callback to change the src of my image based on the its state for a new random image (`Image randomizer`).  
 
 ## Thanks

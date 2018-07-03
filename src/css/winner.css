@@ -25,3 +25,11 @@
         font-size: 30px;
     }
 }
+@media  screen and (max-width: 1920px) {
+    .winner {
+        top: 20%;
+        left: 84.5%;
+        width: 15%;
+        height: 170px;
+    }
+}

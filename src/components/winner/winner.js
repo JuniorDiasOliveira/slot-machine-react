@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import winnerStore from '../stores/winner-store';
 import "../../css/winner.css";
 
 class Winner extends Component {
@@ -16,11 +17,15 @@ class Winner extends Component {
     };
   }
 
-  componentWillUnmount() {
-    this.props.onRef(null);
+  componentWillMount() {
+    winnerStore.on("showWinner", () => {
+      this.handleWinner(winnerStore.getResults())
+    });
   }
-  componentDidMount() {
-    this.props.onRef(this);
+
+  handleWinner(results) {
+    this.drawComponent(true);
+    this.calcResult(results);
   }
 
   drawComponent(showMessage) {
@@ -38,7 +43,6 @@ class Winner extends Component {
     } else {
       this.message = this.listMessages.noLuck;
     }
-    this.forceUpdate();
   }
   show() {
     return this.state.show ? "winner" : "winner none";

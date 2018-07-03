@@ -3,17 +3,21 @@ import strawberry from "../assets/images/strawberry.png";
 import orange from "../assets/images/orange.png";
 import monkey from "../assets/images/monkey.png";
 
-let imagesObj = [banana, strawberry, orange, monkey].map((obj, index) => {
-    return {
-        id: index,
-        src: obj
-    }
-});
+let _imagesObjList = []
 
-const getRamdomImage = () => {
-    return imagesObj.sort(
-        () => 0.5 - Math.random()
-    )[0];
+const imagesSorting = () => 0.5 - Math.random();
+
+const createImageObj = (obj, index) => {
+    return { id: index, src: obj }
 }
+
+const getImages = () => {
+    _imagesObjList = [banana, strawberry, orange, monkey].map(createImageObj);
+    return _imagesObjList;
+}
+
+const getRamdomImage = () => _imagesObjList.length > 0
+    ? _imagesObjList.sort(imagesSorting)[0]
+    : getImages().sort(imagesSorting)[0];
 
 export default getRamdomImage;

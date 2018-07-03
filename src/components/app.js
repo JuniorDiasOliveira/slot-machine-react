@@ -1,77 +1,56 @@
 import React, { Component } from "react";
 import Wheel from "./wheel/wheel";
-import Visor from "./visor/visor";
+import Winner from './winner/winner';
 import ControlButtons from "./control-buttons/control-buttons";
-import Winner from "./winner/winner";
+import wheelActions from "./actions/wheel-actions";
+import winnerActions from "./actions/winner-actions";
 import "../css/app.css";
-import "../css/fontawesome-all.min.css";
 
 class App extends Component {
   constructor() {
     super();
-    this.state = { started: false, showMessage: false };
-    this.run = true;
-    this.resultSet = [];
     this.scheduleWheelsRunning(5000);
-  }
-
-  notRunning = () => this.setState({ started: false });
-  running = () => this.setState({ started: true });
-
-  scheduleWheelsRunning(time) {
-    setTimeout(() => {
-      if (this.run) this.startWheels();
-    }, time);
-  }
-  startWheels() {
-    this.running();
-    this.winner.drawComponent(false);
-    this.run = false;
-  }
-  stopWheels() {
-    this.notRunning();
-  }
-  getResult(result) {
-    if (typeof result !== "undefined") this.resultSet.push(result);
-    if (this.resultSet.length === 3) {
-      this.winner.drawComponent(true);
-      this.winner.calcResult(this.resultSet)
-      this.resultSet = [];
+    this.state = {
+      started: false
     }
   }
+
+  scheduleWheelsRunning = time => {
+    // setTimeout(() => {
+    //   if (this.run) this.startWheels();
+    // }, time);
+  }
+
+  stopWheels = () => wheelActions.changeWheelState(false)
+  startWheels = () => wheelActions.changeWheelState(true)
+
+  getResult = (result) => {
+    winnerActions.changeWinnerState(result);
+  }
+
   render() {
+
     return (
       <div className="app">
-        <Winner
-          onRef={ref => (this.winner = ref)}
+        <Winner></Winner>
+        <Wheel
+          time={10000}
+          speed={50}
+          result={this.getResult}
         />
-        <Visor>
-          <Wheel
-            time={10000}
-            speed={50}
-            start={this.state.started}
-            result={this.getResult.bind(this)}
-          />
-        </Visor>
-        <Visor>
-          <Wheel
-            time={10000}
-            speed={50}
-            start={this.state.started}
-            result={this.getResult.bind(this)}
-          />
-        </Visor>
-        <Visor>
-          <Wheel
-            time={10000}
-            speed={50}
-            start={this.state.started}
-            result={this.getResult.bind(this)}
-          />
-        </Visor>
+        <Wheel
+          time={10000}
+          speed={50}
+          result={this.getResult}
+        />
+        <Wheel
+          time={10000}
+          speed={50}
+          result={this.getResult}
+        />
         <ControlButtons
-          start={this.startWheels.bind(this)}
-          stop={this.stopWheels.bind(this)}
+          start={this.startWheels}
+          stop={this.stopWheels}
         />
       </div>
     );
